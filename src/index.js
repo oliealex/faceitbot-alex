@@ -11,7 +11,9 @@ app.get('/', (req, res) => {
   res.send('Discord Bot')
 })
 
-app.listen(port, () => {})
+app.listen(port, () => {
+  console.log(`test`)
+})
 
 
 dotenv.config();
