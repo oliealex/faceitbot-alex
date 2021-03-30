@@ -1,7 +1,6 @@
 const dotenv = require('dotenv');
 const fetch = require('node-fetch');
 const { Message, MessageEmbed } = require('discord.js');
-const { loggers } = require('winston');
 const logger = require('../logger/logger');
 
 dotenv.config();
@@ -35,7 +34,7 @@ module.exports = {
     const playerID = playerData.player_id;
     const game = 'csgo'
 
-    const getPlayerMatchHistory = await fetch(`${API_ENDPOINT}/players/${playerID}/history?game=${game}&offset=0&limit=20`, {
+    const getPlayerMatchHistory = await fetch(`${API_ENDPOINT}/players/${playerID}/history?game=${game}&offset=0&limit=5`, {
       method: 'GET',
       headers: {
         Authorization: `Bearer ${API_AUTH_KEY_CLIENT}`
@@ -60,12 +59,41 @@ module.exports = {
 
     if ( getLatestMatch.status != '200' ) {
       message.channel.send(`Uncaught error: ${getLatestMatch.status}`)
-      logger.debug(`HTTP error: ${getLatestMatch.status}`)
+      logger.debug(`HTTP error: ${getLatestMatch.status}. getLatestMatch()`)
       return;
     } 
 
     const latestMatch = await getLatestMatch.json();
-    const findPlayerinTeam = latestMatch.rounds[0].teams[0].players.find(player => player == playerID);
-    console.log(findPlayerinTeam);
+    const teams = latestMatch.rounds[0].teams;
+    const players = teams[0].players.concat(teams[1].players);
+    const currentPlayer = players.find(player => player.player_id == playerID)
+    const currentPlayerStats = currentPlayer.player_stats;
+    const matchStats = latestMatch.rounds[0].round_stats
+    const teamWinner = teams.find(team => team.team_id === matchStats.Winner).team_stats.Team;
+    matchStats.Winner = `${teamWinner}`
+
+    let messagePlayerStats = '';
+    let messageMatchStats = '';
+
+    const sortedMatchStats = Object.entries(matchStats).sort();
+    const sortedCurrentPlayerStats = Object.entries(currentPlayerStats).sort();
+
+    for (let i = 0; i < sortedCurrentPlayerStats.length; i += 1) {
+      messagePlayerStats = messagePlayerStats.concat(`**\`${sortedCurrentPlayerStats[i][0]}:\`** \`${sortedCurrentPlayerStats[i][1]}\`\n`);
+    }
+
+    for (let i = 0; i < sortedMatchStats.length; i += 1) {
+      messageMatchStats = messageMatchStats.concat(`**\`${sortedMatchStats[i][0]}:\`** \`${sortedMatchStats[i][1]}\`\n`);
+    }
+
+    const embed = new MessageEmbed()
+    .setTitle(`__Game Stats__`)
+    .setColor(0xFF4500)
+    .addField('Match stats', `${messageMatchStats}`)
+    .addField('Player stats', `${messagePlayerStats}`)
+    .setThumbnail('https://pbs.twimg.com/profile_images/1349712390628270081/KpMEtOII.png')
+    .setFooter("Faceit CSGO stats");
+
+    message.channel.send(embed);
    }
 }
