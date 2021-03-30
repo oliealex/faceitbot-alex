@@ -2,11 +2,21 @@ const dotenv = require('dotenv')
 const Discord = require('discord.js')
 const fs = require('fs');
 
+// Dummy webserver
+const express = require('express')
+const app = express()
+const port = 60
+
+app.get('/', (req, res) => {
+  res.send('Discord Bot')
+})
+
+app.listen(port, () => {})
+
+
 dotenv.config();
 const {PREFIX, BOT_TOKEN } = process.env;
 const logger = require('./logger/logger')
-
-
 
 // Initiate discord.js objects
 const client = new Discord.Client();
