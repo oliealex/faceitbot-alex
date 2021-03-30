@@ -5,13 +5,13 @@ const fs = require('fs');
 // Dummy webserver
 const express = require('express')
 const app = express()
-const port = 60
+const PORT = process.env.PORT || 3000
 
 app.get('/', (req, res) => {
   res.send('Discord Bot')
 })
 
-app.listen(port, () => {
+app.listen(PORT, () => {
   console.log(`test`)
 })
 
