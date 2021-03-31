@@ -2,6 +2,7 @@ const dotenv = require('dotenv');
 const fetch = require('node-fetch');
 const { Message, MessageEmbed } = require('discord.js');
 const logger = require('../logger/logger');
+const common = require('../modules/common')
 
 dotenv.config();
 const { API_AUTH_KEY_CLIENT, API_ENDPOINT } = process.env;
@@ -23,11 +24,9 @@ module.exports = {
       }
     })
 
-    if ( getPlayerData.status != '200' ) {
-      message.channel.send(`Uncaught error: ${getPlayerData.status}`)
-      logger.debug(`HTTP error: ${getPlayerData.status}`)
+    if (common.httpResponseCheck(getPlayerData.status, message)) {
       return;
-    } 
+    }
 
     const playerData = await getPlayerData.json();
     const playerID = playerData.player_id;
@@ -40,9 +39,7 @@ module.exports = {
       }
     })
 
-    if ( getPlayerStats.status != 200 ) {
-      message.channel.send(`HTTP error code: ${getPlayerData.status}`)
-      logger.debug(`HTTP error: ${getPlayerStats.status}`)
+    if (common.httpResponseCheck(getPlayerStats.status, message)) {
       return;
     }
 
@@ -51,12 +48,8 @@ module.exports = {
     const recentResults = lifeTimeStats['Recent Results'].map(item => item == 1 ? 'Win' : 'Loss');
     delete lifeTimeStats['Recent Results'];
     
-    let messageDescription = '';
     const sortedLifeTimeStats = Object.entries(lifeTimeStats).sort();
-
-    for (let i = 0; i < sortedLifeTimeStats.length; i += 1) {
-      messageDescription = messageDescription.concat(`**\`${sortedLifeTimeStats[i][0]}:\`** \`${sortedLifeTimeStats[i][1]}\`\n`)
-    }
+    const messageDescription = common.messageConcat(sortedLifeTimeStats);
 
     const embed = new MessageEmbed()
     .setTitle(`__Player Stats__`)

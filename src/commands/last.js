@@ -17,7 +17,6 @@ module.exports = {
 
    async execute(message, args) {
     const playerName = args[0];
-
     const getPlayerData = await fetch(`${API_ENDPOINT}/players?nickname=${playerName}`, {
       method: 'GET',
       headers: {
