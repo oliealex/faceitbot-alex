@@ -2,6 +2,7 @@ const dotenv = require('dotenv');
 const fetch = require('node-fetch');
 const { Message, MessageEmbed } = require('discord.js');
 const logger = require('../logger/logger');
+const common = require('../modules/common');
 
 dotenv.config();
 const { API_AUTH_KEY_CLIENT, API_ENDPOINT } = process.env;
@@ -72,19 +73,10 @@ module.exports = {
     const teamWinner = teams.find(team => team.team_id === matchStats.Winner).team_stats.Team;
     matchStats.Winner = `${teamWinner}`
 
-    let messagePlayerStats = '';
-    let messageMatchStats = '';
-
     const sortedMatchStats = Object.entries(matchStats).sort();
     const sortedCurrentPlayerStats = Object.entries(currentPlayerStats).sort();
-
-    for (let i = 0; i < sortedCurrentPlayerStats.length; i += 1) {
-      messagePlayerStats = messagePlayerStats.concat(`**\`${sortedCurrentPlayerStats[i][0]}:\`** \`${sortedCurrentPlayerStats[i][1]}\`\n`);
-    }
-
-    for (let i = 0; i < sortedMatchStats.length; i += 1) {
-      messageMatchStats = messageMatchStats.concat(`**\`${sortedMatchStats[i][0]}:\`** \`${sortedMatchStats[i][1]}\`\n`);
-    }
+    const messagePlayerStats = common.messageConcat(sortedCurrentPlayerStats);
+    const messageMatchStats = common.messageConcat(sortedMatchStats);
 
     const embed = new MessageEmbed()
     .setTitle(`__Game Stats__`)

@@ -1,6 +1,6 @@
+const logger = require('../logger/logger');
 
-
-export function messageConcat(data) {
+function messageConcat(data) {
     let message = '';
 
     for (let i = 0; i < data.length; i += 1) {
@@ -9,3 +9,15 @@ export function messageConcat(data) {
 
     return message
 }
+
+function httpResponseCheck(status, message) {
+  if ( status != '200' ) {
+    message.channel.send(`Uncaught error: ${getLatestMatch.status}`)
+    logger.debug(`HTTP error: ${getLatestMatch.status}. getLatestMatch()`)
+    return true;
+  } 
+  return false;
+}
+
+
+module.exports = {messageConcat, httpResponseCheck}
