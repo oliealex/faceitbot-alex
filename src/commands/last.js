@@ -25,11 +25,9 @@ module.exports = {
       }
     })
 
-    if ( getPlayerData.status != '200' ) {
-      message.channel.send(`Uncaught error: ${getPlayerData.status}`)
-      logger.debug(`HTTP error: ${getPlayerData.status}`)
+    if (common.httpResponseCheck(getPlayerData.status, message)) {
       return;
-    } 
+    }
 
     const playerData = await getPlayerData.json();
     const playerID = playerData.player_id;
@@ -42,11 +40,9 @@ module.exports = {
       }
     })
 
-    if ( getPlayerMatchHistory.status != '200' ) {
-      message.channel.send(`Uncaught error: ${getPlayerMatchHistory.status}`)
-      logger.debug(`HTTP error: ${getPlayerMatchHistory.status}`)
+    if (common.httpResponseCheck(getPlayerMatchHistory.status, message)) {
       return;
-    } 
+    }
 
     const playerMatchHistory = await getPlayerMatchHistory.json();
     const latestMatchID = playerMatchHistory.items[0].match_id;
@@ -58,11 +54,9 @@ module.exports = {
       }
     })
 
-    if ( getLatestMatch.status != '200' ) {
-      message.channel.send(`Uncaught error: ${getLatestMatch.status}`)
-      logger.debug(`HTTP error: ${getLatestMatch.status}. getLatestMatch()`)
+    if (common.httpResponseCheck(getLatestMatch.status, message)) {
       return;
-    } 
+    }
 
     const latestMatch = await getLatestMatch.json();
     const teams = latestMatch.rounds[0].teams;

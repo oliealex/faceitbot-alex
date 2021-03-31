@@ -12,8 +12,8 @@ function messageConcat(data) {
 
 function httpResponseCheck(status, message) {
   if ( status != '200' ) {
-    message.channel.send(`Uncaught error: ${getLatestMatch.status}`)
-    logger.debug(`HTTP error: ${getLatestMatch.status}. getLatestMatch()`)
+    message.channel.send(`Uncaught error: ${status}`)
+    logger.debug(`HTTP error: ${status}.`)
     return true;
   } 
   return false;
